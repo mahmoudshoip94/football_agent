@@ -6,23 +6,19 @@ import time
 from functools import lru_cache
 from typing import Annotated, Literal, TypedDict
 
-from .config import get_settings
+from .analytics import analyze_data, discover_data
 from .data_loader import load_datasets
 from .intent import classify_question_scope, is_premier_league_question, query_dataset_scope_limitation
-from .league_tools import get_league_table as table_data_tool, query_team_table_leader
+from .league_tools import get_league_table as table_data_tool
 from .match_tools import (
     get_match_fixtures as fixtures_data_tool,
     gethead_to_head as h2h_data_tool,
     getteam_form as form_data_tool,
-    query_match_analysis,
 )
-from .milestone_tools import get_scoring_milestones as milestone_data_tool, query_scoring_milestone
+from .milestone_tools import get_scoring_milestones as milestone_data_tool
 from .player_tools import (
     compare_player_stats as compare_data_tool,
     get_player_stats as player_data_tool,
-    query_player_comparison,
-    query_player_leader,
-    query_player_stat_limitation,
 )
 from .prompts import FIXTURES_PROMPT, GUARDRAIL_REJECTION, STATS_PROMPT, SUPERVISOR_PROMPT
 
@@ -30,11 +26,9 @@ from .prompts import FIXTURES_PROMPT, GUARDRAIL_REJECTION, STATS_PROMPT, SUPERVI
 @lru_cache(maxsize=1)
 def _runtime():
     """Initialize provider-backed graph and load local data only on first ask()."""
-    settings = get_settings(require_api_key=True)
-
     # Importing agent does not initialize models, contact providers, or discover models.
     from langchain.agents import create_agent
-    from langchain.chat_models import init_chat_model
+    from langchain_ollama import ChatOllama
     from langchain.tools import tool
     from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
     from langgraph.graph import END, START, StateGraph
@@ -58,7 +52,7 @@ def _runtime():
 
         @tool
         def get_scoring_milestones(question: str) -> str:
-            """Analyze first hat-tricks and goal thresholds in default 2024/25 reports; disclose partial coverage and limitations for explicit all-time or other-season requests."""
+            """Return all date-sorted hat-tricks with rank ranges for first, nth or latest queries, or goal thresholds; disclose partial report coverage and explain only relevant same-date ties."""
             return milestone_data_tool(match_reports, question)
 
         @tool
@@ -90,14 +84,24 @@ def _runtime():
 
     (get_table_tool, get_stats_tool, get_compare_tool,
      get_milestone_tool, get_form_tool, get_h2h_tool, get_fixtures_tool) = make_toolset()
+    @tool
+    def inspect_data() -> dict:
+        """Discover source datasets, columns, meanings, identities, and coverage."""
+        return discover_data(table_rows, player_rows, match_reports)
+
+    @tool
+    def analyze(dataset: str, steps: list[dict]) -> dict:
+        """Compose operations: filter(field,operator eq/contains/in/ge/gt/le/lt,value); derive(name,method add/subtract/per90,fields); group(by,metrics {output:{agg sum/mean/min/max/count/distinct/first,field}}); cumulative/difference(by identity keys,field,name), chronological by date; sort(by fields,descending); ordinal(field tie key,position 1-based or -1 last), retaining all ties. Call inspect_data first. No generated code. Return evidence for every claim."""
+        return analyze_data(table_rows, player_rows, match_reports, dataset, steps)
+
     stats_subagent = create_agent(
-        model=settings.strong_model,
-        tools=[get_stats_tool, get_compare_tool, get_table_tool, get_milestone_tool],
+        model=ChatOllama(model="gemma4:e4b", base_url="http://localhost:11434"),
+        tools=[get_stats_tool, get_compare_tool, get_table_tool, get_milestone_tool, inspect_data, analyze],
         system_prompt=STATS_PROMPT,
     )
     fixtures_subagent = create_agent(
-        model=settings.main_model,
-        tools=[get_fixtures_tool, get_form_tool, get_h2h_tool],
+        model=ChatOllama(model="gemma4:e4b", base_url="http://localhost:11434"),
+        tools=[get_fixtures_tool, get_form_tool, get_h2h_tool, inspect_data, analyze],
         system_prompt=FIXTURES_PROMPT,
     )
 
@@ -129,7 +133,7 @@ def _runtime():
     def route_after_guardrail(state) -> Literal["supervisor", "end"]:
         return "end" if state.get("blocked") else "supervisor"
 
-    supervisor_model = init_chat_model(settings.main_model).bind_tools(list(subagent_tools.values()))
+    supervisor_model = ChatOllama(model="gemma4:e4b", base_url="http://localhost:11434").bind_tools(list(subagent_tools.values()))
 
     def supervisor_node(state):
         response = supervisor_model.invoke([SystemMessage(content=SUPERVISOR_PROMPT)] + state["messages"])
@@ -176,34 +180,19 @@ def _runtime():
     return builder.compile(), player_rows, match_reports, table_rows
 
 
-def ask(question: str, max_len: int = 1200) -> str:
+def ask(question: str, max_len: int = 1200, *, history: list[dict] | None = None) -> str:
     """Run the existing supervisor/subagent graph and return its grounded answer."""
     graph, player_rows, match_reports, table_rows = _runtime()
     from langchain_core.messages import HumanMessage
 
-    result = graph.invoke({"messages": [HumanMessage(content=question)], "blocked": False})
+    messages = [{"role": m["role"], "content": m["content"]} for m in history or []
+                if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str)]
+    messages.append(HumanMessage(content=question))
+    limitation = query_dataset_scope_limitation(question)
+    if limitation:
+        return limitation
+    result = graph.invoke({"messages": messages, "blocked": False})
     response = result["messages"][-1].content
-    milestone_response = query_scoring_milestone(match_reports, question)
-    if milestone_response is not None:
-        return milestone_response
-    player_limitation = query_player_stat_limitation(player_rows, question)
-    if player_limitation is not None:
-        return player_limitation
-    scope_limitation = query_dataset_scope_limitation(question)
-    if scope_limitation is not None:
-        return scope_limitation
-    table_leader_response = query_team_table_leader(table_rows, question)
-    if table_leader_response is not None:
-        return table_leader_response
-    player_leader_response = query_player_leader(player_rows, question)
-    if player_leader_response is not None:
-        return player_leader_response
-    player_response = query_player_comparison(player_rows, question)
-    if player_response is not None:
-        return player_response
-    match_response = query_match_analysis(match_reports, question)
-    if match_response is not None:
-        return match_response
     return response[:max_len] + "..." if len(response) > max_len else response
 
 

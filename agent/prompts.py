@@ -28,7 +28,7 @@ STATS_PROMPT = (
     "Use get_player_stats for goals, assists, appearances, minutes, and clean sheets if its "
     "source data contains a clean-sheets field; if a requested field is absent, say so clearly. "
     "Use get_league_table for standings, team goals scored, and goals conceded; compare all rows for best attack or defense. Use "
-    "get_scoring_milestones for first hat-tricks or players reaching a goal threshold, assuming "
+    "get_scoring_milestones for hat-trick chronology or players reaching a goal threshold, assuming "
     "the available 2024/25 reports by default and disclosing their partial coverage. Only if the "
     "user explicitly asks for all-time history or another season, explain that the datasets do "
     "not cover it; do not ask which scope they meant. Never infer chronology from aggregates. "
@@ -71,4 +71,40 @@ SUPERVISOR_PROMPT = (
     "all-time or other-season information, explain the dataset limitation. If an entity itself is "
     "ambiguous, ask a concise clarification. For goal milestones, route to the statistics analyst "
     "and use only deterministic match-report results."
+)
+
+ANALYSIS_POLICY = (
+    " For analytical questions first inspect_data. Use analyze to compose reusable operations. "
+    "Hat-tricks: player_matches filter Performance_Gls ge 3, sort date, ordinal date position. "
+    "Always derive all qualifying events before selecting; keep all date ties, never infer exact goal order. "
+    "For threshold crossings: cumulative Performance_Gls by player/team, filter total ge target, "
+    "group by player/team with first date, sort date, then ordinal. Query returned player/team/date "
+    "again for supporting match evidence. Most hat-tricks or conceded hat-tricks: group qualifying "
+    "rows by player/team or opponent and count. Goals per 90: derive per90 from goals and minutes; "
+    "disclose eligibility. Scoring improvement: difference on chronological player matches including zeros. "
+    "Use get_scoring_milestones for hat-trick chronology. Check every requested part has evidence; "
+    "call tools again for additional operations. Never calculate results in prose or fill missing rows with zeros. "
+    "Preserve player/team identities, clarify ambiguous names. Explain absent data separately from unsupported "
+    "operations. Disclose partial match coverage and unknown aggregate snapshot dates. A goalkeeper clean "
+    "sheet requires participation evidence: use conservative full-match keeper_clean_sheet only; partial "
+    "appearances require unavailable substitution timing. For clean-sheet rankings inspect keeper_matches, "
+    "group keeper_clean_sheet by player/team, and report counts as confirmed full-match clean sheets "
+    "in available reports; do not claim a complete-season clean-sheet leader. Fastest season milestones cannot be established "
+    "from incomplete reports. Resolve follow-ups from conversation and carry context in delegated queries."
+)
+STATS_PROMPT += ANALYSIS_POLICY
+FIXTURES_PROMPT += ANALYSIS_POLICY
+SUPERVISOR_PROMPT += " Carry conversation context in delegated queries. Request further tool evidence for unanswered parts."
+
+STATS_PROMPT += (
+    " For first, second, nth, last or latest hat-tricks, use the complete date-sorted "
+    "get_scoring_milestones results: select the requested rank range, or the final range "
+    "for last/latest. Return all candidates if that range is tied. Match dates establish "
+    "order across different dates; mention missing goal timestamps only when the selected "
+    "rank is tied. Disclose the 2024-08-18 through 2024-12-22 report coverage; latest in "
+    "these reports is not necessarily the final hat-trick of the entire 2024/25 season."
+)
+SUPERVISOR_PROMPT += (
+    " For hat-trick chronology, preserve the analyst's requested event, report coverage "
+    "and relevant date ties. Missing goal timestamps do not prevent ordering different match dates."
 )

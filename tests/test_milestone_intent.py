@@ -93,7 +93,7 @@ def test_unknown_football_entity_is_not_blocked_as_unrelated():
     assert classify_question_scope("What did River Plate do in its last match?") != "out_of_scope"
 
 
-def test_ask_runs_graph_then_uses_deterministic_milestone_result(monkeypatch):
+def test_ask_preserves_graph_answer_instead_of_phrase_override(monkeypatch):
     from types import SimpleNamespace
     import agent.workflow as workflow
 
@@ -108,9 +108,7 @@ def test_ask_runs_graph_then_uses_deterministic_milestone_result(monkeypatch):
     monkeypatch.setattr(workflow, "_runtime", lambda: (FakeGraph(), [], reports, []))
     answer = workflow.ask("Who reached 10 goals first?")
     assert len(calls) == 1
-    assert "Erling Haaland" in answer
-    assert "model fallback" not in answer
-    assert "Do you mean" not in answer
+    assert answer == "model fallback"
 
 
 
@@ -153,7 +151,7 @@ def test_clean_sheets_are_reported_unsupported_for_actual_csv():
     assert result["status"] == "unsupported"
 
 
-def test_player_stat_limitation_flows_through_ask_without_scope_question(monkeypatch):
+def test_ask_preserves_graph_stat_limitation(monkeypatch):
     from types import SimpleNamespace
     from agent.data_loader import load_datasets
     import agent.workflow as workflow
@@ -162,11 +160,10 @@ def test_player_stat_limitation_flows_through_ask_without_scope_question(monkeyp
     table, _, _, _ = load_datasets()
     class FakeGraph:
         def invoke(self, state):
-            return {"messages": [SimpleNamespace(content="model answer must be overridden")]}
+            return {"messages": [SimpleNamespace(content="tool-grounded limitation")]}
     monkeypatch.setattr(workflow, "_runtime", lambda: (FakeGraph(), players, reports, table))
     answer = workflow.ask("Who had the most clean sheets?")
-    assert "can't identify a clean-sheets leader" in answer
-    assert "Which league" not in answer and "Which season" not in answer
+    assert answer == "tool-grounded limitation"  # Graph now owns synthesis; tools own facts.
 
 
 def test_default_player_and_team_leaders_reuse_existing_tools():
@@ -184,7 +181,7 @@ def test_default_player_and_team_leaders_reuse_existing_tools():
     assert "fewest goals conceded" in defense
 
 
-def test_ask_answers_default_leader_queries_from_existing_datasets(monkeypatch):
+def test_ask_keeps_graph_answers_for_default_leader_queries(monkeypatch):
     from types import SimpleNamespace
     import agent.workflow as workflow
 
@@ -195,6 +192,4 @@ def test_ask_answers_default_leader_queries_from_existing_datasets(monkeypatch):
     monkeypatch.setattr(workflow, "_runtime", lambda: (FakeGraph(), players, reports, table))
     top_scorer = workflow.ask("Who scored the most goals?")
     clean_sheets = workflow.ask("Who had the most clean sheets?")
-    assert "Mohamed Salah" in top_scorer and "29 goals" in top_scorer
-    assert "can't identify a clean-sheets leader" in clean_sheets
-    assert "model response" not in top_scorer + clean_sheets
+    assert top_scorer == clean_sheets == "model response"

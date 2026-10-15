@@ -147,7 +147,10 @@ def get_player_stats(
         "starts": "Playing Time_Starts", "appearances": "Playing Time_MP",
         "clean_sheet": "Goalkeeping_CS", "clean_sheets": "Goalkeeping_CS",
     }
-    stat_key = stat_columns.get(requested_stat, "Performance_Gls")
+    if requested_stat not in stat_columns:
+        return json.dumps({"status": "unsupported", "stat": requested_stat,
+                           "message": "Unsupported statistic; inspect available data columns."})
+    stat_key = stat_columns[requested_stat]
     if requested_stat in {"clean_sheet", "clean_sheets"} and not any(
         stat_key in row for row in rows
     ):

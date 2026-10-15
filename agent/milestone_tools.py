@@ -48,40 +48,20 @@ def _period(reports: list[dict[str, Any]]) -> dict[str, str | None]:
 
 
 def _goal_events(match_reports: Iterable[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, str | None]]:
+    """Legacy event view over the same validated relation used by general analysis."""
+    from .analytics import relations, number
     reports = list(match_reports)
     events = []
-    for report in reports:
-        try:
-            match_date = date.fromisoformat(str(report.get("date")))
-        except (TypeError, ValueError):
+    for row in relations([], [], reports)['player_matches']:
+        goals = number(row.get('Performance_Gls'))
+        if goals is None or goals <= 0:
             continue
-        if report.get("competition") and "premier league" not in str(report["competition"]).casefold():
-            continue
-        teams = report.get("teams") or {}
-        home = teams.get("home") or {}
-        away = teams.get("away") or {}
-        for side, opponent_side in (("home", "away"), ("away", "home")):
-            team = (teams.get(side) or {}).get("name")
-            opponent = (teams.get(opponent_side) or {}).get("name")
-            player_rows = (report.get("player_stats") or {}).get(side) or []
-            for player_row in player_rows:
-                name = str(player_row.get("Player") or "").strip()
-                if not name or TEAM_TOTAL_PATTERN.fullmatch(name):
-                    continue
-                goals = _int(player_row.get("Performance_Gls"))
-                if goals is None or goals <= 0:
-                    continue
-                events.append({
-                    "date": match_date.isoformat(), "_date": match_date,
-                    "matchweek": _int(report.get("matchweek")),
-                    "player": name, "team": team, "opponent": opponent,
-                    "venue_status": side, "goals_in_match": goals,
-                    "home_team": home.get("name"), "away_team": away.get("name"),
-                    "home_score": _int(home.get("score")), "away_score": _int(away.get("score")),
-                    "venue_time": report.get("venue_time"),
-                })
-    events.sort(key=lambda row: (row["_date"], row["matchweek"] or 0,
-                                 row["home_team"] or "", row["away_team"] or "", row["player"].casefold()))
+        events.append({**{key: row[key] for key in (
+            'date', 'player', 'team', 'opponent', 'home_team', 'away_team', 'home_score', 'away_score')},
+            'home_score': _int(row['home_score']), 'away_score': _int(row['away_score']),
+            '_date': date.fromisoformat(row['date']), 'matchweek': row.get('matchweek'),
+            'venue_status': row['side'], 'goals_in_match': int(goals), 'venue_time': row.get('venue_time')})
+    events.sort(key=lambda r: (r['_date'], r['home_team'], r['away_team'], r['player']))
     return events, _period(reports)
 
 
@@ -259,7 +239,55 @@ def query_scoring_milestone(match_reports: Iterable[dict[str, Any]], question: s
 
 
 def get_scoring_milestones(match_reports: Iterable[dict[str, Any]], question: str) -> str:
-    result = analyze_milestone_query(match_reports, question)
-    if result is None:
-        result = {"status": "unsupported", "message": "The query does not specify a supported chronological scoring milestone."}
+    if "hat trick" in normalize_question(question) and not _unsupported_milestone_scope(question):
+        result = scoring_events(match_reports)
+        result.pop("precision_note", None)
+        by_date = defaultdict(list)
+        for position, event in enumerate(result.get("rows", []), start=1):
+            by_date[event["date"]].append((position, event))
+        for events in by_date.values():
+            for _, event in events:
+                event["rank_start"], event["rank_end"] = events[0][0], events[-1][0]
+                if len(events) > 1:
+                    event["precision_note"] = (
+                        "Multiple hat-tricks share this date; missing goal timestamps "
+                        "prevent ordering these tied events, not events on different dates."
+                    )
+        result["coverage_note"] = (
+            "Repository match reports cover only 2024-08-18 through 2024-12-22. "
+            "Ranks identify events in the available reports; the latest recorded event "
+            "cannot establish the final hat-trick of the entire 2024/25 season."
+        )
+    else:
+        result = analyze_milestone_query(match_reports, question)
+        if result is None:
+            result = {"status": "unsupported", "message": "The query does not specify a supported chronological scoring milestone."}
     return json.dumps(result, ensure_ascii=False)
+
+
+def scoring_events(match_reports, threshold=None, position=None):
+    """All qualifying player-match events or first threshold crossings per identity."""
+    from .analytics import analyze_data
+    reports = list(match_reports)
+    if threshold is not None and (not isinstance(threshold, int) or threshold <= 0):
+        raise ValueError('Goal threshold must be a positive integer')
+    steps = []
+    if threshold is None:
+        steps.append({'op':'filter', 'field':'Performance_Gls', 'operator':'ge', 'value':3})
+    else:
+        steps.extend([
+            {'op':'cumulative', 'by':['player','team'], 'field':'Performance_Gls', 'name':'total_goals'},
+            {'op':'filter', 'field':'total_goals', 'operator':'ge', 'value':threshold},
+            {'op':'filter', 'field':'total_goals_before', 'operator':'lt', 'value':threshold}])
+    steps.append({'op':'sort','by':['date']})
+    complete = analyze_data([], [], reports, 'player_matches', steps)
+    if position is not None:
+        selected = analyze_data([], [], reports, 'player_matches', steps + [{'op':'ordinal','field':'date','position':position}])
+    else:
+        selected = complete
+    selected['qualifying_events'] = complete.get('row_count', 0)
+    selected['requested_position'] = position
+    selected['threshold'] = threshold
+    selected['ambiguous_order'] = len(selected.get('rows', []))>1 if position is not None else False
+    if selected['ambiguous_order']: selected['status'] = 'ambiguous'
+    return selected

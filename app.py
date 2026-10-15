@@ -23,15 +23,15 @@ def load_page_data():
     return load_datasets()
 
 
-def run_chat_query(question: str) -> str:
+def run_chat_query(question: str, history: list[dict] | None = None) -> str:
     """Delegate conversational questions to the existing agent entry point."""
-    return ask(question)
+    return ask(question, history=history) if history else ask(question)
 
 
-def request_chat_answer(question: str) -> tuple[str | None, str | None]:
+def request_chat_answer(question: str, history: list[dict] | None = None) -> tuple[str | None, str | None]:
     """Return either a successful answer or a sanitized, user-facing error."""
     try:
-        return run_chat_query(question), None
+        return (run_chat_query(question, history) if history else run_chat_query(question)), None
     except Exception as error:  # Provider errors vary by LangChain/provider version.
         return None, friendly_agent_error(error)
 
@@ -130,7 +130,7 @@ def _render_clarification(result: dict[str, Any], entity: str) -> None:
 def _render_chat() -> None:
     st.header("Chat")
     st.caption("Ask natural-language questions about the bundled Premier League dataset.")
-    st.info("Chat history is kept for display in this page. Each ask() call is independent; the agent does not retain conversational memory between messages.")
+    st.info("Conversation context is passed to the agent for follow-up questions.")
     messages = st.session_state.setdefault("football_chat_messages", [])
     for message in messages:
         with st.chat_message(message["role"]):
@@ -146,7 +146,7 @@ def _render_chat() -> None:
         st.markdown(question)
     with st.chat_message("assistant"):
         with st.spinner("Checking the football data…"):
-            answer, error_message = request_chat_answer(question)
+            answer, error_message = request_chat_answer(question, [m for m in messages[:-1] if not m.get("error")])
         if error_message:
             st.error(error_message)
             messages.append({"role": "assistant", "content": error_message, "error": True})
