@@ -1,150 +1,173 @@
-Football Agent — AI-Powered Premier League Analytics
-An intelligent, multi-agent football analytics system built using Python, LangChain, LangGraph, Ollama, and Streamlit.
-Football Agent allows users to explore English Premier League statistics, compare players, analyze team performances, investigate historical match results, and ask natural-language questions through an AI-powered conversational interface.
-The project combines LLM-based reasoning and orchestration with deterministic statistical tools, ensuring that football statistics are retrieved and calculated from structured datasets rather than generated from the language model's general knowledge.
-1. Project Overview
-Football Agent is designed to make football analytics more accessible through natural-language interaction.
-Instead of manually searching through league tables, player statistics, and match reports, users can ask questions such as:
-- Who scored the most goals in the 2024/25 Premier League dataset?
-- Compare Mohamed Salah and Erling Haaland.
-- Which team has the best defense?
-- What were Arsenal's last five available results?
-- Show the head-to-head results between Liverpool and Manchester City.
-- Who scored the first hat-trick in the available match reports?
-- Which player first reached ten goals?
-The system interprets the user's request, delegates tasks to specialized agents when appropriate, executes statistical tools, and generates a readable response.
-Project scope
-Property	Description
-Competition	English Premier League
-Season	2024/25
-Application	Streamlit
-Programming language	Python
-Agent framework	LangChain and LangGraph
-LLM integration	Ollama
-Configured model	gemma4:e4b
-Data sources	Local CSV and JSONL files
-Analytical engine	Deterministic Python functions
-Interaction	Dashboard and conversational AI
-Important: The project analyzes a historical dataset. It does not currently provide live football scores, continuously updated standings, or real-time match information.
-The match-report logic describes partial coverage from August 18, 2024, through December 22, 2024. The aggregate CSV files may represent different snapshots of the season.
-2. Key Features
-2.1 AI Football Chat
-The conversational assistant supports natural-language questions about Premier League football.
-The chat system can:
-- Interpret questions about football statistics.
-- Delegate queries to specialized agents.
-- Use football datasets as the factual source.
-- Support follow-up questions using conversation history.
-- Identify unsupported questions.
-- Request clarification when player or team names are ambiguous.
-- Explain limitations caused by incomplete data.
-2.2 Player Statistics
-Retrieve statistics including goals, assists, appearances, minutes played, starts, and available per-90 metrics.
-Player data is read from Player_Stats.csv.
-2.3 Player Comparison
-Compare two football players across multiple metrics.
-The comparison engine calculates differences between players and handles ambiguous player identities using their team information.
-2.4 League Table Analysis
-Explore Premier League standings, including points, wins, draws, losses, goal difference, and expected-goal statistics where available.
-2.5 Team Form Analysis
-Analyze the latest five available matches for a team, including wins, draws, losses, goals scored, goals conceded, and points earned.
-2.6 Head-to-Head Analysis
-Compare two teams using their meetings in the available match reports.
-The system reports match results and an aggregate record from the perspective of the first selected team.
-2.7 Chronological Scoring Milestones
-Analyze questions involving hat-tricks and scoring thresholds.
-The system supports chronological analysis using match dates and player-level goal statistics.
-2.8 General-Purpose Analytical Operations
-The project includes a reusable analytical engine supporting:
-Operation	Purpose
-filter	Select rows using conditions
-derive	Calculate new statistical fields
-group	Aggregate records
-sort	Order analytical results
-ordinal	Select ranked positions
-cumulative	Calculate cumulative values
-difference	Calculate changes between records
-These operations allow the agent to perform more complex analyses without executing arbitrary model-generated Python code or SQL.
-3. System Architecture
-The system follows a multi-agent architecture with a central supervisor coordinating specialized agents.
-#chatgpt-mermaid-_r_36m_{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;fill:rgb(255, 255, 255);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_36m_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_36m_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_36m_ .error-icon{fill:rgba(255, 255, 255, 0.03);}#chatgpt-mermaid-_r_36m_ .error-text{fill:rgb(255, 255, 255);stroke:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_36m_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_36m_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_36m_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_36m_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_36m_ .marker{fill:rgba(255, 255, 255, 0.498);stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_36m_ .marker.cross{stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_36m_ svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;}#chatgpt-mermaid-_r_36m_ p{margin:0;}#chatgpt-mermaid-_r_36m_ .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .cluster-label text{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .cluster-label span{color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_36m_ .label text,#chatgpt-mermaid-_r_36m_ span{fill:rgb(255, 255, 255);color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .node rect,#chatgpt-mermaid-_r_36m_ .node circle,#chatgpt-mermaid-_r_36m_ .node ellipse,#chatgpt-mermaid-_r_36m_ .node polygon,#chatgpt-mermaid-_r_36m_ .node path{fill:rgb(26, 40, 61);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .rough-node .label text,#chatgpt-mermaid-_r_36m_ .node .label text,#chatgpt-mermaid-_r_36m_ .image-shape .label,#chatgpt-mermaid-_r_36m_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_36m_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .rough-node .label,#chatgpt-mermaid-_r_36m_ .node .label,#chatgpt-mermaid-_r_36m_ .image-shape .label,#chatgpt-mermaid-_r_36m_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_36m_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_36m_ .root .anchor path{fill:rgba(255, 255, 255, 0.498)!important;stroke-width:0;stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_36m_ .arrowheadPath{fill:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_36m_ .edgePath .path{stroke:rgba(255, 255, 255, 0.498);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .flowchart-link{stroke:rgba(255, 255, 255, 0.498);fill:none;}#chatgpt-mermaid-_r_36m_ .edgeLabel{background-color:rgb(24, 24, 24);text-align:center;}#chatgpt-mermaid-_r_36m_ .edgeLabel p{background-color:rgb(24, 24, 24);}#chatgpt-mermaid-_r_36m_ .edgeLabel rect{opacity:0.5;background-color:rgb(24, 24, 24);fill:rgb(24, 24, 24);}#chatgpt-mermaid-_r_36m_ .labelBkg{background-color:rgba(24, 24, 24, 0.5);}#chatgpt-mermaid-_r_36m_ .cluster rect{fill:rgba(255, 255, 255, 0.03);stroke:rgba(255, 255, 255, 0.082);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .cluster text{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ .cluster span{color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;background:rgba(255, 255, 255, 0.03);border:1px solid rgba(255, 255, 255, 0.082);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_36m_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_36m_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_36m_ .icon-shape,#chatgpt-mermaid-_r_36m_ .image-shape{background-color:rgb(24, 24, 24);text-align:center;}#chatgpt-mermaid-_r_36m_ .icon-shape p,#chatgpt-mermaid-_r_36m_ .image-shape p{background-color:rgb(24, 24, 24);padding:2px;}#chatgpt-mermaid-_r_36m_ .icon-shape .label rect,#chatgpt-mermaid-_r_36m_ .image-shape .label rect{opacity:0.5;background-color:rgb(24, 24, 24);fill:rgb(24, 24, 24);}#chatgpt-mermaid-_r_36m_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_36m_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_36m_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_36m_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_36m_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_36m_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_36m_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_36m_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_36m_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_36m_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_36m_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_36m_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_36m_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_36m_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_36m_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_36m_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_36m_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_36m_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_36m_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .node rect,#chatgpt-mermaid-_r_36m_ .node circle,#chatgpt-mermaid-_r_36m_ .node ellipse,#chatgpt-mermaid-_r_36m_ .node polygon,#chatgpt-mermaid-_r_36m_ .node path{fill:rgb(0, 40, 77);stroke:rgba(255, 255, 255, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_36m_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_36m_ .node.mermaid-decision .label-container{fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_36m_ .edgePaths .flowchart-link{stroke:rgba(255, 255, 255, 0.498);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_36m_ .marker{fill:rgba(255, 255, 255, 0.498);stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_36m_ :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}UserStreamlit DashboardScope GuardrailDeterministic Python ToolsLangGraph SupervisorScope RejectionStatistics AnalystFixtures ReporterStatistics and Analytics ToolsFixtures and Match ToolsLocal CSV and JSONLChatDashboard pagesIn scopeOut of scope
+# Football Agent
 
+### Local AI assistance and deterministic Premier League analytics
 
+Football Agent combines a Streamlit dashboard, a LangGraph supervisor, two specialist LangChain agents, and Python analysis tools to answer questions about the **English Premier League 2024/25** using local CSV and JSONL files.
 
+The language model interprets questions, delegates work, selects tools, and explains results. Python loads records and performs comparisons, aggregations, chronological calculations, and validation. The active application runs inference through **Ollama with `gemma4:e4b`**.
 
+> **Data scope:** Available match reports cover **August 18–December 22, 2024**. Aggregate CSV statistics cover a broader period; all league-table rows show 38 matches played, but exact CSV snapshot dates are unknown. These are historical dataset answers, not live football updates.
+>
+> **Fresh-clone requirement:** `Data/` is ignored by Git. Supply the three required datasets separately before running the application or source-backed tests.
 
-3.1 Supervisor Agent
-The supervisor is the main coordinator of the conversational system.
-Its responsibilities include understanding the user's question, selecting the appropriate specialist, delegating tasks, preserving relevant conversation context, and combining specialist responses.
-The supervisor exposes two delegation tools:
-- call_stats_analyst(query)
-- call_fixtures_reporter(query)
-3.2 Statistics Analyst Agent
-The Statistics Analyst handles statistical and analytical questions about players, teams, league rankings, and scoring milestones.
-Its tools include:
-Tool	Responsibility
-get_player_stats	Retrieve player statistics
-compare_player_stats	Compare two players
-get_league_table	Retrieve league standings
-get_scoring_milestones	Analyze scoring milestones
-inspect_data	Discover available datasets and columns
-analyze	Execute structured analytical operations
-3.3 Fixtures Reporter Agent
-The Fixtures Reporter handles match-related questions.
-Its tools include:
-Tool	Responsibility
-get_match_fixtures	Retrieve recorded fixtures and results
-getteam_form	Analyze recent team form
-gethead_to_head	Compare recorded meetings
-inspect_data	Inspect available analytical data
-analyze	Execute structured analysis
-3.4 Deterministic Execution Layer
-The project separates language-model reasoning from statistical calculations.
-The LLM selects tools and analytical operations, while Python functions execute the calculations.
-This architecture reduces dependence on LLM-generated numerical answers and avoids executing arbitrary model-generated Python or SQL.
-It does not, however, guarantee that every model-selected tool or final interpretation will be correct.
-4. Technology Stack
-Technology	Purpose
-Python	Core application and data processing
-LangChain	Agent and tool integrations
-LangGraph	Supervisor workflow orchestration
-Ollama	Local language-model runtime
-Streamlit	Interactive dashboard
-CSV	Aggregate player and league data
-JSONL	Match reports
-pytest	Automated testing
-Declared dependencies
-The repository's requirements.txt contains:
-langchain
-langchain-ollama
-python-dotenv
-requests
-pytest
-streamlit
+## Contents
 
+- [Overview and objectives](#overview-and-objectives)
+- [Key features](#key-features)
+- [Technology stack](#technology-stack)
+- [High-level architecture](#high-level-architecture)
+- [Agents, tools, and execution flow](#agents-tools-and-execution-flow)
+- [Repository structure](#repository-structure)
+- [Prerequisites](#prerequisites)
+- [Installation and setup](#installation-and-setup)
+- [LLM configuration](#llm-configuration)
+- [Datasets and schemas](#datasets-and-schemas)
+- [Running the dashboard](#running-the-dashboard)
+- [Example questions](#example-questions)
+- [Python API](#python-api)
+- [Analytics engine](#analytics-engine)
+- [Conversation history](#conversation-history)
+- [Errors and unsupported requests](#errors-and-unsupported-requests)
+- [Testing and validation](#testing-and-validation)
+- [Known limitations and troubleshooting](#known-limitations-and-troubleshooting)
+- [Future improvements](#future-improvements)
+- [Contributing and license](#contributing-and-license)
 
-The source also imports langgraph and langchain_core, which are not separately pinned in the dependency file.
-5. Repository Structure
+## Overview and objectives
+
+The project separates natural-language orchestration from numerical work. Its supervisor routes statistical questions to a statistics analyst and match-oriented questions to a fixtures reporter. Both specialists can discover available fields and compose operations over normalized local data.
+
+The analytical interface uses reusable operations rather than a separate function for every question. Hat-trick rankings, counts by player, and counts by conceding opponent can all use player-match records filtered to at least three goals.
+
+Dedicated tools remain available for common tasks: player comparisons, standings, recent form, head-to-head records, and scoring milestones. There is no unrestricted generated Python execution, database, football-data API, or automatic dataset update process.
+
+## Key features
+
+| Feature | Implemented behavior |
+|---|---|
+| Natural-language chat | Supervisor and specialist agents use native LangChain tool calling through local Ollama. |
+| Data discovery | Six analytical relations, columns, selected field meanings, identities, and coverage. |
+| Composable analysis | Filtering, arithmetic, per-90 rates, grouping, sorting, cumulative totals, consecutive differences, and ordinals. |
+| Player statistics | Goals, assists, appearances, minutes, starts, contributions, and available source rates. |
+| Player comparison | Team-qualified resolution, ambiguity reporting, source values, and A-minus-B differences. |
+| Hat-trick chronology | All qualifying player-match events ordered by date, with rank ranges for ties. |
+| Goal thresholds | Configurable cumulative crossings from observed player-match records. |
+| Match analysis | Available fixtures/results, latest five available matches, two-team form comparisons, and head-to-head meetings. |
+| Dashboard | Compact Home summaries, shared chat history, and dedicated analysis pages. |
+| Offline statistics | Direct Python tools and non-chat pages require no model inference. |
+| Regression coverage | Synthetic cases, source-data checks, mocked chat, notebook parity checks, and Streamlit AppTest coverage. |
+
+These are implemented tool capabilities. Deterministic tests do not guarantee successful live-model interpretation of every phrasing.
+
+## Technology stack
+
+| Component | Role |
+|---|---|
+| Python | Loading, normalization, calculations, validation, and application code. |
+| LangChain | `create_agent`, tool schemas, messages, and specialist tool loops. |
+| LangGraph | Supervisor state, guardrail routing, delegation, and response loop. |
+| `langchain-ollama` | `ChatOllama` integration for the active runtime. |
+| Ollama / `gemma4:e4b` | Local model server and model. |
+| Streamlit | Dashboard, forms, chat, session state, caching, tables, and charts. |
+| CSV / JSONL | Local aggregate statistics and match reports. |
+| pytest | Deterministic, mocked, UI, and opt-in provider tests. |
+| Jupyter notebooks | Standalone learning implementations and experiments with legacy provider setup. |
+
+[requirements.txt](requirements.txt) declares `langchain`, `langchain-ollama`, `python-dotenv`, `requests`, `pytest`, and `streamlit`. Versions are unpinned. LangGraph and LangChain Core are currently supplied transitively. Jupyter and the notebooks' legacy Groq integration are not declared application dependencies.
+
+## High-level architecture
+
+```mermaid
+flowchart TD
+    UI[Streamlit chat] --> API[ask with explicit history]
+    PY[Python caller] --> API
+    API --> INIT[Lazy cached runtime and data loading]
+    INIT --> SCOPE{Explicit unsupported season or history?}
+    SCOPE -- Yes --> LIMIT[Dataset limitation response]
+    SCOPE -- No --> G[Guardrail node]
+    G -- Clearly out of scope --> REJECT[Scope response]
+    G -- In scope or uncertain --> S[Supervisor node]
+    S -- Delegation calls --> T[Tools node]
+    T --> SA[Statistics analyst]
+    T --> FR[Fixtures reporter]
+    SA --> ST[Statistics and milestone tools]
+    FR --> MT[Fixture, form, and head-to-head tools]
+    SA --> AT[inspect_data and analyze]
+    FR --> AT
+    ST --> DATA[Local CSV and JSONL datasets]
+    MT --> DATA
+    AT --> DATA
+    SA --> T
+    FR --> T
+    T -- ToolMessage results --> S
+    S -- No tool calls --> ANSWER[Final natural-language answer]
+    PAGES[Other dashboard pages] --> DIRECT[Deterministic UI adapters]
+    DIRECT --> DATA
+    S -. Inference .-> O[Ollama: gemma4:e4b]
+    SA -. Inference .-> O
+    FR -. Inference .-> O
+```
+
+The outer graph has three nodes: `guardrail`, `supervisor`, and `tools`. Specialists are LangChain agents invoked as supervisor tools, not additional outer graph nodes.
+
+## Agents, tools, and execution flow
+
+### Responsibilities and registered tools
+
+| Component | Responsibility | Registered tools |
+|---|---|---|
+| Supervisor | Interpret requests, carry context into delegation, combine responses, and formulate the answer. | `call_stats_analyst(query)`, `call_fixtures_reporter(query)` |
+| Statistics analyst | Player/team statistics, standings, comparisons, scoring events, and statistical plans. | `get_player_stats`, `compare_player_stats`, `get_league_table`, `get_scoring_milestones`, `inspect_data`, `analyze` |
+| Fixtures reporter | Match lookups, form, head-to-head records, and match-based analytical plans. | `get_match_fixtures`, `getteam_form`, `gethead_to_head`, `inspect_data`, `analyze` |
+
+`getteam_form` and `gethead_to_head` are existing tool names. Their underlying dictionary-returning functions are `team_form` and `head_to_head`.
+
+| Tool interface seen by the model | Purpose |
+|---|---|
+| `get_player_stats(player_name=None, team=None, stat=None, limit=10)` | Filter aggregate players and rank by a supported statistic; returns JSON text. |
+| `compare_player_stats(player_a, player_b, team_a=None, team_b=None)` | Resolve players and return source values, rates, and differences as JSON text. |
+| `get_league_table(top_n=None)` | Stored standings sorted by source position; returns JSON text. |
+| `get_scoring_milestones(question)` | Complete ranked hat-trick evidence, or legacy first-threshold analysis; returns JSON text. |
+| `get_match_fixtures(matchweek=None, team=None, limit=20)` | Available reports sorted by matchweek and date; returns JSON text. |
+| `getteam_form(team_a, team_b=None)` | Latest five available matches per team; returns JSON text. |
+| `gethead_to_head(team_a, team_b)` | Available meetings and Team A's record; returns JSON text. |
+| `inspect_data()` | Relations, fields, row counts, and limitations; returns a dictionary. |
+| `analyze(dataset, steps)` | Ordered, validated analytical operations; returns a dictionary. |
+
+Graph tools close over loaded datasets. Direct Python functions accept the corresponding dataset first; see [Python API](#python-api).
+
+### Request lifecycle
+
+1. Streamlit submits through `request_chat_answer()` → `run_chat_query()` → `agent.ask()`. Python callers can invoke `ask()` directly.
+2. The first call to `_runtime()` loads and validates files, creates three Ollama model instances, constructs agents, and compiles the graph. The runtime is cached with `lru_cache(maxsize=1)`.
+3. `ask()` accepts prior user/assistant messages and appends the new question. Explicit unsupported historical/season requests can return a limitation before graph execution, but runtime construction happens first.
+4. The guardrail uses lightweight scope rules. Clearly unrelated subjects or other competitions are blocked; uncertain phrasing reaches the supervisor.
+5. The supervisor chooses delegation tools. Specialists use their own LangChain tool loops to obtain deterministic evidence.
+6. The outer tools node appends `ToolMessage` results and returns control to the supervisor. Specialist invocation failures are retried up to three times; exhausted failures become warning text.
+7. The supervisor delegates again or responds. `ask()` returns its final message, truncating to `max_len` characters plus `...` if necessary.
+
+Graph state contains accumulated `messages` using LangGraph's `add_messages` reducer and a `blocked` flag. There is no persistent checkpointer. Evidence-grounding instructions are prompts, not a separate automatic fact-verification stage. The runtime uses native tool calling; it does not configure `with_structured_output()` for final answers.
+
+## Repository structure
+
+```text
 football_agent/
-├── app.py
-├── README.md
-├── VALIDATION.md
-├── requirements.txt
-├── pytest.ini
-├── notebook.ipynb
-├── test.ipynb
 ├── agent/
-│   ├── __init__.py
-│   ├── workflow.py
-│   ├── config.py
-│   ├── data_loader.py
-│   ├── intent.py
-│   ├── prompts.py
-│   ├── analytics.py
-│   ├── player_tools.py
-│   ├── league_tools.py
-│   ├── match_tools.py
-│   └── milestone_tools.py
+│   ├── __init__.py          # Public ask import
+│   ├── workflow.py          # Lazy models, agents, tools, and StateGraph
+│   ├── prompts.py           # Routing and evidence instructions
+│   ├── intent.py            # Scope rules and limited typo normalization
+│   ├── config.py            # Data paths and legacy Groq settings
+│   ├── data_loader.py       # CSV/JSONL loading and basic validation
+│   ├── analytics.py         # Six relations and analytical operations
+│   ├── player_tools.py      # Lookup, comparison, and legacy formatters
+│   ├── league_tools.py      # Standings and legacy leader formatter
+│   ├── match_tools.py       # Fixtures, form, head-to-head, team resolution
+│   └── milestone_tools.py   # Hat-tricks, thresholds, and chronology
+├── Data/                    # Required local files; ignored by Git
+│   ├── Table.csv
+│   ├── Player_Stats.csv
+│   └── match_reports.jsonl
 ├── tests/
 │   ├── test_agent_tools.py
 │   ├── test_analytics.py
@@ -152,229 +175,480 @@ football_agent/
 │   ├── test_live_analytics.py
 │   ├── test_milestone_intent.py
 │   └── test_streamlit_app.py
-└── Data/
-    ├── Table.csv
-    ├── Player_Stats.csv
-    └── match_reports.jsonl
+├── app.py                   # Streamlit entry point
+├── notebook.ipynb           # Standalone implementation and experiments
+├── test.ipynb               # Legacy setup/middleware experiment
+├── requirements.txt
+├── pytest.ini
+├── VALIDATION.md            # Historical validation report
+├── .gitignore
+└── README.md
+```
 
+## Prerequisites
 
-Note: Data/ is the expected runtime directory. It is excluded by .gitignore and is not included in the inspected GitHub revision.
-6. Installation and Setup
-Prerequisites
-Install Python 3.10 or newer, Git, and Ollama. A modern Python 3.11+ environment is recommended, although the repository does not define a verified compatibility matrix.
-Step 1 — Clone the repository
+- Git and Python. The documentation audit used **Python 3.12.10**. The code uses modern type annotations; no complete supported-version range is declared or tested.
+- Three local datasets. A clean clone does not include them.
+- For chat: Ollama at `http://localhost:11434` with the exact `gemma4:e4b` tag installed.
+- Enough local resources to run the model; the project defines no hardware minimum or GPU configuration.
+- For dataframe/chart pages: an environment able to load Streamlit's native dependencies, including PyArrow.
+
+No cloud API key is required for the active application. Installing dependencies or downloading a missing model requires network access; football records are read locally.
+
+## Installation and setup
+
+Subsequent Python commands assume an activated virtual environment and the repository root as the current directory.
+
+### 1. Clone the project
+
+```bash
 git clone https://github.com/mahmoudshoip94/football_agent.git
 cd football_agent
+```
 
+### 2. Create an environment and install dependencies
 
-Step 2 — Create a virtual environment
+**Windows PowerShell**
+
+```powershell
 python -m venv .venv
-
-
-Activate it on Linux or macOS:
-source .venv/bin/activate
-
-
-On Windows PowerShell:
 .\.venv\Scripts\Activate.ps1
-
-
-Step 3 — Install dependencies
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+```
 
+If activation is blocked, use the interpreter directly, for example `.\.venv\Scripts\python.exe -m pip install -r requirements.txt`.
 
-Step 4 — Provide the datasets
-Create a Data/ directory in the repository root and supply:
+**macOS / Linux**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+There is no installable package configuration. Use the Python API from the repository root, or explicitly add this directory to Python's import path.
+
+### 3. Supply the data
+
+Create `Data/` and supply the exact filenames:
+
+```text
 Data/Table.csv
 Data/Player_Stats.csv
 Data/match_reports.jsonl
+```
 
+Obtain compatible files from the maintainer or another authorized source. No downloader, scraper, or data-fetch command is included. Paths resolve relative to `agent/config.py`, not the terminal's working directory.
 
-These files are required but not provided by the public repository.
-Verify that they can be loaded:
+Validate without invoking a model:
+
+```bash
 python -c "from agent.data_loader import load_datasets; print(load_datasets()[3])"
+```
 
+### 4. Prepare Ollama for chat
 
-Step 5 — Configure Ollama
-The current workflow initializes Ollama using:
-ChatOllama(    model="gemma4:e4b",    base_url="http://localhost:11434")
+Install Ollama from its [official download page](https://ollama.com/download), then inspect installed models:
 
-
-
-Start Ollama:
-ollama serve
-
-
-Check available models:
+```bash
 ollama list
+```
 
+If the exact tag is absent:
 
-The configured model tag must exist in your Ollama environment. If it is unavailable, install a supported compatible model and update the ChatOllama initializations in agent/workflow.py.
-Configuration note: The repository still contains Groq configuration references, but the actual workflow uses Ollama. Adding GROQ_API_KEY does not switch the running agent to Groq.
-7. Datasets and Data Coverage
-The application relies on three local data sources.
-7.1 League Table Dataset
-File: Data/Table.csv
-Contains team-level statistics such as ranking, matches played, wins, draws, losses, goals scored, goals conceded, goal difference, points, and available expected-goal metrics.
-7.2 Player Statistics Dataset
-File: Data/Player_Stats.csv
-Contains player-level statistics such as:
-- Player and squad names
-- Appearances and starts
-- Minutes played
-- Goals and assists
-- Penalty statistics
-- Cards
-- Per-90 performance metrics
-Required source columns include:
-Player
-Squad
-Playing Time_Min
-Playing Time_MP
-Performance_Gls
-Performance_Ast
-Per 90 Minutes_Gls
-Per 90 Minutes_Ast
-Per 90 Minutes_G+A
+```bash
+ollama pull gemma4:e4b
+```
 
+If Ollama is not already serving through its application or service, start it in another terminal:
 
-7.3 Match Reports Dataset
-File: Data/match_reports.jsonl
-Contains match-level information including dates, participating teams, scores, and optional player and goalkeeper statistics.
-These reports support fixture lookups, recent form, head-to-head analysis, and scoring milestones.
-Data coverage limitations
-The project's recorded documentation describes:
-Dataset	Recorded coverage
-League table	20 teams
-Player statistics	574 player rows
-Match reports	158 reports
-Report date range	August 18 – December 22, 2024
-These counts come from repository documentation and could not be independently checked without the missing datasets.
-The system must not interpret partial reports as complete-season or all-time historical coverage.
-8. Running the Application
-Launch the Streamlit dashboard:
-streamlit run app.py
+```bash
+ollama serve
+```
 
+Do not start a second server when Ollama already serves the default port. To check basic inference interactively:
 
-The application provides six navigation sections.
-Page	Description
-Home	Featured players, leading teams, embedded chat
-Chat	Natural-language AI assistant
-Player Comparison	Side-by-side player metrics and charts
-Team Form	Recent available results and summary
-Head-to-Head	Recorded meetings between two teams
-League Table	Historical standings
-The data-driven dashboard pages do not require LLM inference. The chat feature requires a working Ollama model.
-9. Python API Usage
-9.1 Ask the AI Agent
-from agent import askanswer = ask(    "Compare Mohamed Salah and Erling Haaland",    max_len=4000)print(answer)
+```bash
+ollama run gemma4:e4b
+```
 
+A plain reply does not validate the project's native tool-calling workflow.
 
+## LLM configuration
 
-The ask() function supports explicit conversation history:
-follow_up = ask(    "Who has more goals per 90?",    history=[        {            "role": "user",            "content": "Compare Mohamed Salah and Erling Haaland"        },        {            "role": "assistant",            "content": answer        }    ],    max_len=4000)print(follow_up)
+The active [workflow](agent/workflow.py) initializes all three models with:
 
+```python
+from langchain_ollama import ChatOllama
 
+model = ChatOllama(
+    model="gemma4:e4b",
+    base_url="http://localhost:11434",
+)
+```
 
-The default max_len is 1,200 characters. Longer responses require a higher limit.
-9.2 Use Deterministic Tools Directly
-import jsonfrom agent.data_loader import load_datasetsfrom agent.player_tools import compare_players, get_player_statsfrom agent.match_tools import team_form, head_to_headfrom agent.league_tools import get_league_tableteams, players, reports, metadata = load_datasets()comparison = compare_players(    players,    "Mohamed Salah",    "Erling Haaland")print(comparison)top_assists = json.loads(    get_player_stats(players, stat="assists", limit=5))print(top_assists)print(team_form(reports, "Arsenal"))print(head_to_head(reports, "Arsenal", "Chelsea"))print(json.loads(get_league_table(teams, top_n=5)))
+The statistics specialist, fixtures specialist, and supervisor share this configuration. The supervisor uses `.bind_tools(...)`; specialists receive tools through `create_agent(...)`. There is no cloud fallback. Temperature, seed, context size, and other generation parameters are not explicitly configured.
 
+**Configuration caveat:** The workflow hardcodes model and address. It does not read `OLLAMA_MODEL` or `OLLAMA_BASE_URL`; changing them does not select a different model or endpoint here.
 
+### Legacy provider references
 
-These functions can be used without the LLM.
-10. Agent Workflow
-The conversation workflow is implemented using LangGraph.
-#chatgpt-mermaid-_r_3b3_{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;fill:rgb(255, 255, 255);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_3b3_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_3b3_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_3b3_ .error-icon{fill:rgba(255, 255, 255, 0.03);}#chatgpt-mermaid-_r_3b3_ .error-text{fill:rgb(255, 255, 255);stroke:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_3b3_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_3b3_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_3b3_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_3b3_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_3b3_ .marker{fill:rgba(255, 255, 255, 0.498);stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_3b3_ .marker.cross{stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_3b3_ svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;}#chatgpt-mermaid-_r_3b3_ p{margin:0;}#chatgpt-mermaid-_r_3b3_ .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .cluster-label text{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .cluster-label span{color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_3b3_ .label text,#chatgpt-mermaid-_r_3b3_ span{fill:rgb(255, 255, 255);color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .node rect,#chatgpt-mermaid-_r_3b3_ .node circle,#chatgpt-mermaid-_r_3b3_ .node ellipse,#chatgpt-mermaid-_r_3b3_ .node polygon,#chatgpt-mermaid-_r_3b3_ .node path{fill:rgb(26, 40, 61);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .rough-node .label text,#chatgpt-mermaid-_r_3b3_ .node .label text,#chatgpt-mermaid-_r_3b3_ .image-shape .label,#chatgpt-mermaid-_r_3b3_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_3b3_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .rough-node .label,#chatgpt-mermaid-_r_3b3_ .node .label,#chatgpt-mermaid-_r_3b3_ .image-shape .label,#chatgpt-mermaid-_r_3b3_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_3b3_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_3b3_ .root .anchor path{fill:rgba(255, 255, 255, 0.498)!important;stroke-width:0;stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_3b3_ .arrowheadPath{fill:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_3b3_ .edgePath .path{stroke:rgba(255, 255, 255, 0.498);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .flowchart-link{stroke:rgba(255, 255, 255, 0.498);fill:none;}#chatgpt-mermaid-_r_3b3_ .edgeLabel{background-color:rgb(24, 24, 24);text-align:center;}#chatgpt-mermaid-_r_3b3_ .edgeLabel p{background-color:rgb(24, 24, 24);}#chatgpt-mermaid-_r_3b3_ .edgeLabel rect{opacity:0.5;background-color:rgb(24, 24, 24);fill:rgb(24, 24, 24);}#chatgpt-mermaid-_r_3b3_ .labelBkg{background-color:rgba(24, 24, 24, 0.5);}#chatgpt-mermaid-_r_3b3_ .cluster rect{fill:rgba(255, 255, 255, 0.03);stroke:rgba(255, 255, 255, 0.082);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .cluster text{fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ .cluster span{color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;background:rgba(255, 255, 255, 0.03);border:1px solid rgba(255, 255, 255, 0.082);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_3b3_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_3b3_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_3b3_ .icon-shape,#chatgpt-mermaid-_r_3b3_ .image-shape{background-color:rgb(24, 24, 24);text-align:center;}#chatgpt-mermaid-_r_3b3_ .icon-shape p,#chatgpt-mermaid-_r_3b3_ .image-shape p{background-color:rgb(24, 24, 24);padding:2px;}#chatgpt-mermaid-_r_3b3_ .icon-shape .label rect,#chatgpt-mermaid-_r_3b3_ .image-shape .label rect{opacity:0.5;background-color:rgb(24, 24, 24);fill:rgb(24, 24, 24);}#chatgpt-mermaid-_r_3b3_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_3b3_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_3b3_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_3b3_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_3b3_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_3b3_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_3b3_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_3b3_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3b3_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_3b3_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3b3_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_3b3_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_3b3_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_3b3_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_3b3_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .node rect,#chatgpt-mermaid-_r_3b3_ .node circle,#chatgpt-mermaid-_r_3b3_ .node ellipse,#chatgpt-mermaid-_r_3b3_ .node polygon,#chatgpt-mermaid-_r_3b3_ .node path{fill:rgb(0, 40, 77);stroke:rgba(255, 255, 255, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_3b3_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_3b3_ .node.mermaid-decision .label-container{fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_3b3_ .edgePaths .flowchart-link{stroke:rgba(255, 255, 255, 0.498);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_3b3_ .marker{fill:rgba(255, 255, 255, 0.498);stroke:rgba(255, 255, 255, 0.498);}#chatgpt-mermaid-_r_3b3_ :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}STARTGuardrailENDSupervisorTool ExecutorOut of scopeIn scopeDelegateFinal response
+| Location | Current state |
+|---|---|
+| `agent/workflow.py` | Active Ollama inference; no Groq model initialization or key requirement. |
+| `agent/config.py` | Groq model constants and `get_settings(require_api_key=False)`, which optionally loads `.env` and reads `GROQ_API_KEY`. The active workflow does not call it. |
+| `app.py` | Obsolete Groq-key error-message branch; it does not configure the active model. |
+| `notebook.ipynb` | Standalone tools, agents, graph, and experiments; model setup and connectivity checks still use Groq. |
+| `test.ipynb` | Groq-key check and model constant in experimental setup. |
+| `tests/test_live_analytics.py` | Calls active `ask()`, but its gate requires `GROQ_API_KEY` and `RUN_LIVE_LLM_TESTS=1`. |
+| `VALIDATION.md` | Historical provider/test guidance predating the current runtime and dashboard. |
 
+Notebooks are learning artifacts, not application entry points. They are not an Ollama-equivalent, ready-to-run setup; legacy provider dependencies are absent from `requirements.txt`. Selected deterministic functions have parity tests, but full notebook execution and provider parity are not established.
 
+## Datasets and schemas
 
+### Files and observed coverage
 
+Counts were calculated from local files during this audit. Untracked data can differ between checkouts.
 
-The supervisor can delegate to the Statistics Analyst and Fixtures Reporter. Each specialist can invoke its own analytical tools.
-The graph is initialized lazily on the first ask() call.
-The guardrail uses keyword and pattern matching to identify clearly unrelated requests. It is not a comprehensive security or prompt-injection defense.
-11. Analytics Engine
-The project includes six analytical relations.
-Relation	Description
-players	Aggregate player records
-teams	Aggregate club records
-matches	Unique match records
-team_matches	Team-level match performance
-player_matches	Individual match appearances
-keeper_matches	Goalkeeper match records
-The analyze_data() function accepts a structured sequence of operations.
-Example: Find the earliest recorded hat-trick
-from agent.analytics import analyze_datafrom agent.data_loader import load_datasetsteams, players, reports, _ = load_datasets()result = analyze_data(    teams,    players,    reports,    "player_matches",    [        {            "op": "filter",            "field": "Performance_Gls",            "operator": "ge",            "value": 3        },        {            "op": "sort",            "by": ["date"]        },        {            "op": "ordinal",            "field": "date",            "position": 1        }    ])print(result["rows"])
+| File | Format | Records | Purpose and coverage |
+|---|---|---:|---|
+| `Data/Table.csv` | UTF-8 CSV, optional BOM | 20 | Standings; all rows have `MP=38`. Exact snapshot date unknown. |
+| `Data/Player_Stats.csv` | UTF-8 CSV, optional BOM | 574 | Player/team totals and rates. Exact snapshot date unknown. |
+| `Data/match_reports.jsonl` | UTF-8 JSON Lines | 158 | Played matches dated `2024-08-18` through `2024-12-22`; incomplete season. |
 
+`Data/` is excluded by [.gitignore](.gitignore); none of these files is tracked. Repository metadata does not establish dataset provenance, redistribution rights, or a download URL.
 
+### CSV columns
 
-Example: Rank players by recorded hat-tricks
-result = analyze_data(    teams,    players,    reports,    "player_matches",    [        {            "op": "filter",            "field": "Performance_Gls",            "operator": "ge",            "value": 3        },        {            "op": "group",            "by": ["player", "team"],            "metrics": {                "hat_tricks": {                    "agg": "count"                }            }        },        {            "op": "sort",            "by": ["hat_tricks"],            "descending": True        }    ])print(result["rows"])
+| Dataset | Columns checked by `validate_datasets()` | Additional fields used by tools |
+|---|---|---|
+| Table | `Rk`, `Squad`, `MP`, `Pts` | `W`, `D`, `L`, `GF`, `GA`, `GD`, `Pts/MP`, `xG`, `xGA`, `xGD`, `xGD/90`, `Top Team Scorer`, `Goalkeeper`, `Notes` |
+| Players | `Player`, `Squad`, `Playing Time_Min`, `Playing Time_MP`, `Performance_Gls`, `Performance_Ast`, `Per 90 Minutes_Gls`, `Per 90 Minutes_Ast`, `Per 90 Minutes_G+A` | `Nation`, `Pos`, `Age`, `Playing Time_Starts`, `Playing Time_90s`, `Performance_G+A`, `Performance_G-PK`, `Performance_PK`, `Performance_PKatt`, `Performance_CrdY`, `Performance_CrdR`, `Per 90 Minutes_G-PK`, `Per 90 Minutes_G+A-PK` |
 
+CSV values start as strings. Tools perform numerical conversion. Initial validation checks required column names on the first row, nonempty datasets, and basic report dates/team fields; it is not exhaustive schema or completeness validation. Some legacy presentation tools default missing numerical fields to zero; the generic engine propagates unavailable numerical inputs as `None`.
 
+The player CSV has no `Goalkeeping_CS` field. Overall G+A per 90 and non-penalty G+A per 90 are distinct fields and must not be substituted.
 
-The engine supports up to 30 operations per analysis request.
-It validates operation names, available fields, and arguments rather than executing unrestricted generated code.
-12. Testing and Validation
-The project uses pytest for automated testing.
-Run the full test suite:
+### Match-report shape
+
+A JSONL line may be a report or an object containing `match_report`. The loader unwraps that field and does not retain outer record identifiers.
+
+| Field | Shape / purpose |
+|---|---|
+| `date` | ISO date, `YYYY-MM-DD`. |
+| `teams.home`, `teams.away` | Objects with `name` and `score`, plus source team metadata. |
+| `competition`, `matchweek` | Competition filtering and matchweek context. |
+| `player_stats.home`, `player_stats.away` | Individual rows including `Player`, `Min`, `Performance_Gls`, `Performance_Ast`. |
+| `keeper_stats.home`, `keeper_stats.away` | Rows including `Player`, `Min`, `Shot Stopping_GA`; additional fields include shots on target, saves, and save percentage. |
+| `lineups` | Lineup/bench information; alone it does not establish participation. |
+| `venue`, `attendance`, `venue_time`, `local_time`, `officials`, `title` | Additional context, not exposed by every tool. |
+
+Summary rows named like `11 Players` are excluded from individual analytical records. Individual goal timestamps are unavailable. Kickoff times do not establish when a player completed a hat-trick.
+
+### Loading, normalization, and caching
+
+`load_datasets()` returns `(table_rows, player_rows, match_reports, metadata)`. CSV uses `csv.DictReader`; JSONL is parsed per nonblank line, reporting malformed JSON by line number.
+
+The generic engine excludes invalid/out-of-competition reports and aggregate player rows, checks nonnegative integer scores, and constructs match IDs as `date|home_team|away_team`. Repeated match identities and individual rows are deduplicated in its relations. Conflicting duplicates are not comprehensively reconciled; dedicated legacy tools may normalize differently.
+
+Streamlit caches `load_page_data()` using `st.cache_data`; the agent separately caches its runtime and loaded data. Restart after replacing files to refresh both consistently.
+
+## Running the dashboard
+
+```bash
+python -m streamlit run app.py
+```
+
+Open Streamlit's printed URL. The sidebar defaults to **Home**.
+
+| Page | Current interface |
+|---|---|
+| Home | Equal-width top panels: **four featured scorers** with team/goals/assists and **five leading teams** with points and available goal difference. Full-width chat below, with 350-pixel scrollable history and input beneath it. |
+| Chat | Standalone chat sharing Home's session conversation. |
+| Player Comparison | Select or enter players, resolve team identities, show values/differences and a goals/assists chart. |
+| Team Form | Latest five available matches, result totals, and coverage disclosure. |
+| Head-to-Head | Available meetings and the first team's record. |
+| League Table | Complete stored standings with played, wins, draws, losses, goals, goal difference, and points. |
+
+Rankings are dynamic. The featured-player helper returns up to five distinct player/team identities; Home displays four. Complete standings are on **League Table**, not a Home expander.
+
+Opening pages loads data without invoking the model. Ollama is needed on chat submission. Home uses native text containers; dataframe pages require working PyArrow support.
+
+## Example questions
+
+Default context is Premier League 2024/25. These illustrate available operations, not a claim that every prompt passed live evaluation.
+
+| Question | Evidence / calculation |
+|---|---|
+| “Who scored the most goals?” | Aggregate CSV ranking. |
+| “Compare Mohamed Salah and Erling Haaland.” | Player comparison and source rates. |
+| “Which team conceded the fewest goals?” | Stored table ranked by `GA`. |
+| “Who scored the second hat-trick?” | All player-match goal counts ≥3, ordered by date, then requested rank. |
+| “What was the latest hat-trick in the available reports?” | Final date/rank range with coverage disclosure. |
+| “Which teams conceded the most hat-tricks?” | Filter events, group by opponent, count, sort. |
+| “Who was the second player to reach 10 goals in these reports?” | Cumulative goals, first crossings, chronological ordinal; requires general analysis. |
+| “Who had the best goals-per-90 rate with at least 900 minutes?” | Eligibility filter, goals × 90 / minutes, ranking. |
+| “What was the highest-scoring available match?” | Score sum ranked with ties. |
+| “What is Arsenal's recent form?” | Latest five available reports, not current real-world form. |
+| “Show Chelsea versus Arsenal head-to-head.” | Meetings present in partial reports. |
+
+Follow-ups such as “And the third?” require prior conversation context. All-time records, other seasons, future schedules, and complete-season chronology cannot be established from these reports.
+
+## Python API
+
+### Natural-language entry point
+
+```python
+from agent import ask
+
+# Requires local data and a working Ollama tool-calling runtime.
+question = "Who scored the second hat-trick in the available reports?"
+answer = ask(question, max_len=6000)
+print(answer)
+
+print(ask(
+    "And the third?",
+    max_len=6000,
+    history=[
+        {"role": "user", "content": question},
+        {"role": "assistant", "content": answer},
+    ],
+))
+```
+
+Public signature:
+
+```text
+ask(question: str, max_len: int = 1200, *, history: list[dict] | None = None) -> str
+```
+
+Only user/assistant history entries with string content are accepted. `max_len` limits output characters, not model tokens. Increase it for long lists.
+
+### Deterministic tools without inference
+
+```python
+import json
+from agent.data_loader import load_datasets
+from agent.league_tools import get_league_table
+from agent.match_tools import get_match_fixtures, head_to_head, team_form
+from agent.player_tools import compare_players, get_player_stats
+
+table, players, reports, metadata = load_datasets()
+print(metadata)
+print(json.loads(get_player_stats(players, stat="goals", limit=5)))
+print(compare_players(players, "Mohamed Salah", "Erling Haaland"))
+print(json.loads(get_league_table(table, top_n=5)))
+print(team_form(reports, "Arsenal"))
+print(head_to_head(reports, "Chelsea", "Arsenal"))
+print(json.loads(get_match_fixtures(reports, matchweek=2, limit=20)))
+```
+
+Dictionary-returning signatures include `compare_players(rows, player_a, player_b, team_a=None, team_b=None)`, `team_form(match_reports, team_a, team_b=None)`, and `head_to_head(match_reports, team_a, team_b)`. Graph-facing wrappers serialize these results as JSON strings.
+
+### Configurable scoring events
+
+```python
+from agent.data_loader import load_datasets
+from agent.milestone_tools import scoring_events
+
+_, _, reports, _ = load_datasets()
+all_hat_tricks = scoring_events(reports)
+second_hat_trick = scoring_events(reports, position=2)
+latest_hat_trick = scoring_events(reports, position=-1)
+second_ten_goal_crossing = scoring_events(reports, threshold=10, position=2)
+print(second_hat_trick)
+print(second_ten_goal_crossing)
+```
+
+`scoring_events(match_reports, threshold=None, position=None)` returns rows, qualifying-event count, requested position, threshold, coverage, and ambiguity information. Positions are one-based; negative positions count from the end. Selecting a tied date returns all candidates with `ambiguous` status.
+
+### Discover and compose analysis
+
+```python
+from agent.analytics import analyze_data, discover_data
+from agent.data_loader import load_datasets
+
+table, players, reports, _ = load_datasets()
+print(discover_data(table, players, reports))
+result = analyze_data(table, players, reports, "player_matches", [
+    {"op": "filter", "field": "Performance_Gls", "operator": "ge", "value": 3},
+    {"op": "group", "by": ["player", "team"],
+     "metrics": {"hat_tricks": {"agg": "count"}}},
+    {"op": "sort", "by": ["hat_tricks"], "descending": True},
+])
+print(result)
+```
+
+Direct signatures are `discover_data(table, players, reports)` and `analyze_data(table, players, reports, dataset, steps)`. Neither invokes a model.
+
+## Analytics engine
+
+### Relations
+
+| Relation | Origin | Useful fields |
+|---|---|---|
+| `players` | Aggregate player CSV | Source columns plus `player`, `team`. |
+| `teams` | Standings CSV | Source columns plus `team`. |
+| `matches` | Valid unique reports | `date`, `match_id`, home/away teams and scores, `total_goals`. |
+| `team_matches` | Two perspectives per match | Match evidence, `team`, `opponent`, `side`, goals for/against, goal difference, points. |
+| `player_matches` | Individual player rows | Match evidence, player/team identity, source goals/assists/minutes. |
+| `keeper_matches` | Keeper rows | Match evidence, source fields, conservative `keeper_clean_sheet`. |
+
+Inspected files produce 574 player rows, 20 team rows, 158 matches, 316 team-match rows, 4,813 player-match rows, and 320 keeper-match rows.
+
+### Operations
+
+| Operation | Step fields | Behavior |
+|---|---|---|
+| `filter` | `field`, `value`, optional `operator` | `eq`, `contains`, `in`, `ge`, `gt`, `le`, `lt`; numeric comparisons when values are numeric. |
+| `derive` | `name`, `method`, `fields` | `add`, `subtract`, `per90`; per-90 is numerator × 90 / positive denominator. |
+| `group` | `by`, `metrics` | `sum`, `mean`, `min`, `max`, `count`, `distinct`, `first`. |
+| `cumulative` | `by`, `field`, `name` | Chronological running totals per identity, previous total, observed match count. |
+| `difference` | `by`, `field`, `name` | Change from the preceding observed value, including recorded zeros. |
+| `sort` | `by`, optional `descending` | One or more fields; missing values last. |
+| `ordinal` | `field`, `position` | Select an ordered position and retain rows sharing its tie field. Sort first. |
+
+Plans have at most 30 steps. Referenced columns are checked against the current relation. `first` selects the minimum non-null source value, yielding the earliest ISO date; it is not an arbitrary first-row operation. Numerical group aggregations return `None` when any contributing value is invalid/missing. Missing goals prevent later cumulative totals from being treated as complete.
+
+Typical results include `status`, `rows`, `row_count`, `source_rows`, `steps`, `dataset`, `data_period`, `coverage_note`, `precision_note`, `identity_note`, `warnings`, and `support`. Unsupported plans may return shorter error results. There is no arbitrary SQL, generated-code execution, general join operation, or automatic pagination.
+
+### Chronology and milestones
+
+A hat-trick is **one player scoring at least three goals in one match**. Four goals qualify; goals across matches do not combine. Separate players in one match create separate events.
+
+The active hat-trick tool returns all date-sorted events with `rank_start` and `rank_end`. The analyst selects the requested first/nth/latest range. Dates order events across different days. Missing timestamps matter when distinguishing events on the same date; preserve every tied candidate.
+
+Threshold calculations sum goals chronologically by `(player, team)` and record first observed crossings of a configurable target. They establish dates and match evidence, not exact goal minutes. Observed-match counts are not full-season appearances, and a recorded crossing is not necessarily the true season crossing date.
+
+**Interface distinction:** `scoring_events()` and general analysis support arbitrary crossing ordinals. The threshold branch of `get_scoring_milestones(question)` still uses the legacy first-crossing helper, so the model must use general analysis for second/third threshold requests. Legacy `first_hat_tricks()` and `first_to_goal_threshold()` remain available.
+
+### Goalkeeper clean sheets
+
+The player CSV cannot directly rank clean sheets. `keeper_clean_sheet` is populated only when a side has exactly one goalkeeper row, the keeper has exactly 90 recorded minutes, and keeper goals allowed agrees with the final team score.
+
+For eligible rows, zero conceded yields `1`; a concession yields `0`. Other rows remain unknown. These are conservative confirmed full-match observations, not a full-season ranking or every competition rule for partial appearances.
+
+## Conversation history
+
+Home and Chat share `st.session_state["football_chat_messages"]`. Switching pages retains messages. Prior non-error messages are explicitly passed to `ask(history=...)`, providing backend context rather than display-only history.
+
+The supervisor receives the conversation; specialists receive delegated queries. The supervisor must carry relevant context into those queries. There is no durable history database, user-account history, cross-session persistence, automatic summarization, or context-window trimming.
+
+Home limits visible history to 350 pixels with autoscroll. Stored message count and the history sent to the model are unbounded.
+
+## Errors and unsupported requests
+
+| Condition | Handling |
+|---|---|
+| Missing/empty datasets or required fields | Loader raises; Streamlit displays a data-loading message and stops rendering. |
+| Malformed JSONL | `ValueError` with file and line number. |
+| Missing/ambiguous comparison entity | `clarification_required`, with candidates where available. |
+| Unknown metric/column/operation | Unsupported result rather than arbitrary execution. |
+| No qualifying rows | Generic `not_found`; dedicated tools may use statuses such as `not_reached`. |
+| Explicit unsupported historical scope | Available season/reporting period explained. |
+| Clearly unrelated request | Premier League scope response. |
+| Specialist invocation failure | Up to three attempts, then warning text to the supervisor. |
+| Chat exception reaching the UI | Sanitized timeout/provider/generic error stored in history. |
+
+Direct `ask()` callers can receive exceptions; no universal error envelope exists. Supervisor inference has no project-defined retry loop. There is no dedicated Ollama preflight or empty-response recovery. Assistant error messages remain visible but are excluded from subsequent context.
+
+## Testing and validation
+
+### Commands
+
+With dependencies installed and datasets supplied, run from the repository root:
+
+```bash
+# Complete suite, including data and Streamlit checks
 python -m pytest -q
 
+# Focused deterministic tools and chronology
+python -m pytest -q tests/test_agent_tools.py tests/test_hat_trick_chronology.py tests/test_milestone_intent.py
 
-Exclude optional integration tests:
-python -m pytest -q -m "not integration"
+# Source syntax
+python -m compileall -q app.py agent
 
+# Diff whitespace and conflict-marker checks
+git diff --check
+```
 
-Tests cover player statistics, match analysis, chronological milestones, analytical operations, mocked agent orchestration, and Streamlit interface behavior.
-Previously recorded results
-The repository's VALIDATION.md reports:
-Result	Count
-Passed	51
-Skipped	7
-Failed	3
-The three recorded failures were attributed to Windows Application Control blocking a PyArrow native library during Streamlit table-rendering tests.
-A separate focused run reported 43 passed and 7 skipped.
-These are historical results from the repository documentation, not independently reproduced test results.
-13. Known Limitations
-Limitation	Description
-Missing datasets	Required Data/ files are not committed
-Provider mismatch	Groq references remain, while the workflow uses Ollama
-Partial match coverage	Match reports do not cover the complete season
-Historical-only data	No live scores or current standings
-Missing goal timestamps	Exact intra-match goal chronology cannot be established
-Player identity	No globally stable player IDs
-Dependency versions	Requirements are not version-pinned
-Persistent memory	Chat history is held in the Streamlit session
-Deployment	No verified production deployment configuration
-Licensing	No tracked license file
-14. Troubleshooting
-Missing dataset error
-Check that the Data/ directory exists and contains all three required files with valid schemas.
-Ollama connection error
-Verify the model runtime:
-ollama list
+Real-data tests cannot all pass on an unprepared clone because datasets are ignored.
 
+### Coverage
 
-Ensure the server is running and the configured model tag matches an installed model.
-Groq API key does not work
-The active workflow uses Ollama. Groq environment variables do not automatically configure the running agent.
-Incomplete match results
-Match reports cover only part of the historical season. Missing reports may affect rankings, form, head-to-head results, and scoring milestones.
-Ambiguous player names
-Specify the player's team when multiple records match the same name.
-15. Future Improvements
-Recommended development priorities:
-1. Reproducible data setup: Provide sample datasets, documented data acquisition, and schema validation.
-2. Unified model configuration: Make provider, model name, and endpoint configurable.
-3. Dependency management: Pin compatible versions and add automated CI checks.
-4. Data coverage tracking: Record dataset timestamps and completeness.
-5. Agent evaluation: Measure tool selection, factual correctness, and analytical accuracy.
-6. Production readiness: Add deployment configuration, observability, and error monitoring.
-7. Advanced analytics: Expand player and team analysis after improving data completeness.
-These are recommendations, not features currently implemented in the repository.
-16. Contributing and License
-Contributions should preserve the separation between LLM reasoning and deterministic statistical execution.
-New features should include appropriate tests, clear data provenance, and explicit limitations where source coverage is incomplete.
-The repository does not currently include a tracked LICENSE file. Reuse and redistribution permissions should be confirmed with the repository owner.
+| Test module | Main coverage |
+|---|---|
+| `test_agent_tools.py` | Comparison, ambiguous/missing names, rates, form, head-to-head, imports, selected notebook parity. |
+| `test_analytics.py` | Event/threshold edges, aggregations/rates/ranks, missing values, keeper evidence, mocked plans, notebook analysis parity. |
+| `test_hat_trick_chronology.py` | First/nth/latest ranks, source reconciliation, coverage, timestamp caveats for ties. |
+| `test_milestone_intent.py` | Scope/defaults, limited typos, legacy milestones, data limitations, graph-answer preservation. |
+| `test_streamlit_app.py` | Home, dynamic rankings, history/navigation, no inference on opening, 40 mocked submissions, errors. |
+| `test_live_analytics.py` | Seven opt-in `ask()` prompts with an obsolete Groq gate. |
+
+Mocked `ask()` tests validate context and deterministic planning fixtures, not Gemma's independent tool selection. An intended real-StateGraph test with mocked models currently fails before dispatch because its provider mock is outdated.
+
+### Documentation-audit results — October 15, 2026
+
+| Check actually executed | Result |
+|---|---|
+| `python -m pytest -q --tb=short` | **66 passed, 7 skipped, 4 failed**. |
+| Focused tools/chronology command above | **33 passed**. |
+| Deterministic APIs | Imports, data loading, comparison, standings, fixtures, form, head-to-head, first/second/third/latest hat-tricks, a configurable threshold, and grouped hat-trick analysis passed. |
+| Streamlit startup | Temporary headless server returned HTTP 200 / `ok` at its health endpoint, then stopped. This does not establish every browser interaction. |
+| Ollama availability | `ollama list` confirmed `gemma4:e4b`. No inference or live graph query ran during this audit. |
+| Python/notebooks | Source syntax and notebook JSON/code-cell syntax checked; notebooks were not executed end to end. |
+| README | Local references, Python example syntax, and `git diff --check` checked. |
+
+Four executable Python example blocks ran without inference; the `ask()` example was checked for syntax and actual API signatures only. The Ollama download link returned HTTP 200, and installed CLI help confirmed the documented `pull`, `serve`, and `run` commands. A fresh clone, new environment installation, model download, interactive inference, and macOS/Linux setup were not performed during this audit; existing local dependencies and data were used.
+
+Four failures remain:
+
+- `test_real_graph_routes_and_combines_tools_with_mock_models` patches nonexistent `agent.workflow.get_settings` and targets the old model initializer.
+- Three Streamlit tests could not import PyArrow's DLL because local Windows Application Control blocked it: broad page rendering, comparison rendering, and team-page rendering.
+
+All seven live tests skipped. Their gate requires `RUN_LIVE_LLM_TESTS=1` and legacy `GROQ_API_KEY`, although `ask()` uses Ollama. Align that gate before relying on it for local-provider verification. Normal application setup does not need cloud credentials.
+
+[VALIDATION.md](VALIDATION.md) records older implementation results and Groq-oriented guidance. It is historical, not this audit's status. This documentation change does not establish a green full suite or successful live Gemma orchestration.
+
+## Known limitations and troubleshooting
+
+| Symptom or limitation | Explanation / action |
+|---|---|
+| Missing data | Supply exact filenames and run loader validation. Git does not provide the files. |
+| Chat connection failure | Confirm Ollama at `http://localhost:11434` and inspect `ollama list`. No cloud fallback exists. |
+| Model not found | Install exact tag `gemma4:e4b`. |
+| Environment changes do nothing | Active model/address are hardcoded; legacy settings do not control them. |
+| Wrong tools or empty response | Requires live integration investigation; no automatic answer verifier or empty-response repair exists. |
+| Notebook requests Groq | Notebook setup is legacy. The application needs no Groq key. |
+| PyArrow DLL failure | Use an environment permitted to load Streamlit's native dependencies. Policy blocks are not data issues. |
+| Latest result is in December 2024 | That is report coverage, not the full season or present day. |
+| Aggregate/report totals differ | They cover different periods; do not treat coverage as identical. |
+| Same-date milestone tie | Missing goal timestamps; preserve candidates. |
+| Player matches multiple teams | Supply qualifiers; no global IDs or automatic transfer merging. |
+| Per-90 leader has few minutes | Specify a minimum-minute filter; no universal eligibility minimum is automatic. |
+| Cut-off answers | `ask()` defaults to 1,200 characters; increase `max_len` in Python. Streamlit uses the default. |
+| Stale data after replacement | Restart to refresh Streamlit and agent caches. |
+
+Additional data is required for full-season chronology, true fastest season milestones, complete clean-sheet rankings, other seasons, all-time comparisons, precise goal times, and future fixtures. Consecutive changes refer to consecutive **observed** player rows, not necessarily every real appearance.
+
+## Future improvements
+
+These are proposals, not existing functionality:
+
+- Align legacy configuration, notebooks, errors, and provider mocks with Ollama.
+- Replace the live-test gate and evaluate actual Gemma tool selection on unseen questions and follow-ups.
+- Declare direct dependency/version constraints and a supported Python range.
+- Document dataset acquisition, provenance, snapshot dates, and redistribution permissions.
+- Expand reports and add stable player IDs, goal timestamps, and keeper substitution intervals.
+- Strengthen full-row validation and conflicting-duplicate reconciliation.
+- Bound conversation context and improve local-model errors.
+- Reduce threshold-routing ambiguity while preserving reusable analytical operations.
+
+## Contributing and license
+
+Inspect schemas, result structures, coverage notes, and callers before changing tools. Keep calculations deterministic, preserve player/team identities, and distinguish missing data from unsupported operations. Add appropriate synthetic/source-backed checks and separate live-model verification from mocked tests.
+
+Run tests and syntax checks, review `git diff --check`, and explain remaining failures. Shared notebook behavior should retain useful standalone implementations rather than replacing learning cells with imports alone.
+
+**License:** No license file is present in the inspected Git tree. This README assigns no license and implies no redistribution permission for code or datasets. Clarify applicable terms with the maintainer before redistribution.
