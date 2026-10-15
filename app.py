@@ -11,7 +11,7 @@ from agent import ask
 from agent.data_loader import load_datasets
 from agent.league_tools import get_league_table
 from agent.match_tools import H2H_NOTE, PERIOD_NOTE, head_to_head, team_form
-from agent.player_tools import compare_players
+from agent.player_tools import compare_players, get_player_stats
 
 ENTER_MANUALLY = "Enter a name…"
 SELECT_PROMPT = "Choose from available data…"
@@ -127,32 +127,84 @@ def _render_clarification(result: dict[str, Any], entity: str) -> None:
         st.caption(result["reason"])
 
 
-def _render_chat() -> None:
-    st.header("Chat")
-    st.caption("Ask natural-language questions about the bundled Premier League dataset.")
-    st.info("Conversation context is passed to the agent for follow-up questions.")
+def _render_chat(*, embedded: bool = False) -> None:
+    if embedded:
+        st.subheader("AI Football Chat")
+    else:
+        st.header("Chat")
+        st.caption("Ask natural-language questions about the bundled Premier League dataset.")
+        st.info("Conversation context is passed to the agent for follow-up questions.")
     messages = st.session_state.setdefault("football_chat_messages", [])
-    for message in messages:
-        with st.chat_message(message["role"]):
-            if message.get("error"):
-                st.error(message["content"])
-            else:
-                st.markdown(message["content"])
-    question = st.chat_input("Ask about players, fixtures, form, head-to-head, or standings…")
+    history = st.container(
+        height=350 if embedded else "content", border=False,
+        key="home_chat_history" if embedded else None,
+        autoscroll=True if embedded else None,
+    )
+    with history:
+        for message in messages:
+            with st.chat_message(message["role"]):
+                if message.get("error"):
+                    st.error(message["content"])
+                else:
+                    st.markdown(message["content"])
+    question = st.chat_input(
+        "Ask about players, fixtures, form, head-to-head, or standings…",
+        key="home_chat_input" if embedded else None,
+    )
     if not question:
         return
     messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant"):
-        with st.spinner("Checking the football data…"):
-            answer, error_message = request_chat_answer(question, [m for m in messages[:-1] if not m.get("error")])
-        if error_message:
-            st.error(error_message)
-            messages.append({"role": "assistant", "content": error_message, "error": True})
-        else:
-            st.markdown(answer)
-            messages.append({"role": "assistant", "content": answer})
+    with history:
+        with st.chat_message("user"):
+            st.markdown(question)
+        with st.chat_message("assistant"):
+            with st.spinner("Checking the football data…"):
+                answer, error_message = request_chat_answer(question, [m for m in messages[:-1] if not m.get("error")])
+            if error_message:
+                st.error(error_message)
+                messages.append({"role": "assistant", "content": error_message, "error": True})
+            else:
+                st.markdown(answer)
+                messages.append({"role": "assistant", "content": answer})
+
+
+def get_featured_players_for_ui(player_rows) -> list[dict[str, Any]]:
+    """Rank distinct player/team identities using the existing numeric stats helper."""
+    unique = {}
+    for row in player_rows:
+        player = str(row.get("Player") or "").strip()
+        team = str(row.get("Squad") or "").strip()
+        if player:
+            unique.setdefault((player.casefold(), team.casefold()), row)
+    return json.loads(get_player_stats(unique.values(), stat="goals", limit=5))
+
+
+def _render_home(table_rows, player_rows) -> None:
+    top_left, top_right = st.columns([1, 1], gap="medium")
+    with top_left, st.container(border=True, height="stretch"):
+        st.subheader("Featured Players")
+        players = get_featured_players_for_ui(player_rows)[:4]
+        if not players:
+            st.info("No player statistics are available.")
+        st.markdown("  \n".join(
+            f"**{rank}. {player['player']}** · {player['team'] or 'Team not recorded'} "
+            f"— {player['goals']} goals · {player['assists']} assists"
+            for rank, player in enumerate(players, start=1)
+        ))
+    with top_right, st.container(border=True, height="stretch"):
+        st.subheader("Top 5 League Teams")
+        rows = sorted(get_league_table_for_ui(table_rows), key=lambda row: row["position"])[:5]
+        gd_teams = {row.get("Squad") for row in table_rows if row.get("GD") not in (None, "")}
+        if not rows:
+            st.info("No standings are available.")
+        leaderboard = []
+        for row in rows:
+            goal_diff = f" · GD {row['goal_diff']:+d}" if row["team"] in gd_teams else ""
+            leaderboard.append(f"**{row['position']}. {row['team']}** · {row['points']} points{goal_diff}")
+        st.markdown("  \n".join(leaderboard))
+    st.divider()
+    with st.container(border=True):
+        _render_chat(embedded=True)
 
 
 def _render_player_comparison(player_rows) -> None:
@@ -288,18 +340,23 @@ def _render_league_table(table_rows) -> None:
 
 def main() -> None:
     st.set_page_config(page_title="Football Analytics", page_icon="⚽", layout="wide")
-    st.title("⚽ Football Analytics")
-    st.caption("Premier League 2024/25 dataset tools")
     with st.sidebar:
         st.header("Navigate")
-        section = st.radio("Section", ["Chat", "Player Comparison", "Team Form", "Head-to-Head", "League Table"], label_visibility="collapsed")
+        section = st.radio("Section", ["Home", "Chat", "Player Comparison", "Team Form", "Head-to-Head", "League Table"], label_visibility="collapsed")
+    if section == "Home":
+        st.subheader("⚽ Football Analytics · Premier League 2024/25")
+    else:
+        st.title("⚽ Football Analytics")
+        st.caption("Premier League 2024/25 dataset tools")
     try:
         table_rows, player_rows, match_reports, metadata = load_page_data()
     except Exception:
         st.error("The football datasets could not be loaded. Check that the repository Data files are present and valid.")
         return
     teams = _team_names(table_rows, match_reports)
-    if section == "Chat":
+    if section == "Home":
+        _render_home(table_rows, player_rows)
+    elif section == "Chat":
         _render_chat()
     elif section == "Player Comparison":
         _render_player_comparison(player_rows)
